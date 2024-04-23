@@ -16,6 +16,21 @@ def option_page():
     logo_label = ctk.CTkLabel(option_page, text="", image=logo, bg_color="#FFD700")  # Color de fondo amarillo para el logo
     logo_label.pack(pady=20, padx=150)
 
+    def funcion_boton1():
+        print("Botón 1 presionado")
+
+    def funcion_boton2():
+        print("Botón 2 presionado")
+
+        # Crear los botones y asignarles las funciones
+    boton1 = ctk.CTkButton(option_page, text="Botón 1", command=funcion_boton1)
+    boton2 = ctk.CTkButton(option_page, text="Botón 2", command=funcion_boton2)
+
+    # Posicionar los botones en la misma fila
+    boton1.place(relx=0.5, rely=0.8, anchor="e", relwidth=0.2)
+    boton2.place(relx=0.5, rely=0.8, anchor="w", relwidth=0.2)
+    boton1.pack(padx=10)
+    boton2.pack(padx=10)
     # Mostrar la nueva ventana
     option_page.mainloop()
 
