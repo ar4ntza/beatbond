@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
+
+
 def option_page():
     mainpage.destroy()
     option_page = ctk.CTk()
@@ -22,17 +24,44 @@ def option_page():
     def funcion_boton2():
         print("Botón 2 presionado")
 
-        # Crear los botones y asignarles las funciones
-    boton1 = ctk.CTkButton(option_page, text="Botón 1", command=funcion_boton1)
-    boton2 = ctk.CTkButton(option_page, text="Botón 2", command=funcion_boton2)
+    # Crear los botones y asignarles las funciones
+    frame_botones = ctk.CTkFrame(option_page, bg_color="#FBEBC7")
+    frame_botones.pack(pady=20)
 
-    # Posicionar los botones en la misma fila
-    boton1.place(relx=0.5, rely=0.8, anchor="e", relwidth=0.2)
-    boton2.place(relx=0.5, rely=0.8, anchor="w", relwidth=0.2)
-    boton1.pack(padx=10)
-    boton2.pack(padx=10)
+    # Posicionar los botones en la misma fila con un espacio entre ellos dentro del contenedor
+    boton1 = ctk.CTkButton(frame_botones, text="BROWSE", command=browse_page, corner_radius=32, fg_color="#5A2B71", hover_color="#9350b4", border_color='#5A2B71', font=boton_font,  bg_color="#FBEBC7")
+    boton2 = ctk.CTkButton(frame_botones, text="GENRES", command=genres_page, corner_radius=32, fg_color="#5A2B71", hover_color="#9350b4", border_color='#5A2B71', font=boton_font,  bg_color="#FBEBC7")
+
+    boton1.pack(side="left", padx=10)  # Espaciado horizontal desde el centro
+    boton2.pack(side="left", padx=10)  # Espaciado horizontal desde el centro
+
     # Mostrar la nueva ventana
     option_page.mainloop()
+
+def browse_page():
+    option_page.destroy()
+    browse_page = ctk.CTk()
+    browse_page.title("Browse Songs")
+    browse_page.geometry("700x700")
+    browse_page.config(background='#FBEBC7')
+
+def genres_page():
+    option_page.destroy()
+    genres = ctk.CTk()
+    genres.title("Browse Songs")
+    genres.geometry("700x700")
+    genres_page.config(background='#FBEBC7')
+
+    #Logo
+    logo_image = Image.open('images/beatbond_logo.png')
+    logo = ctk.CTkImage(light_image=logo_image, dark_image=logo_image, size=(600, 600))  # width x height
+    logo_label = ctk.CTkLabel(option_page, text="", image=logo, bg_color="#FFD700")  # Color de fondo amarillo para el logo
+    logo_label.pack(pady=20, padx=150)
+
+    # Mostrar la nueva ventana
+    option_page.mainloop()
+    browse_page.mainloop()
+    genres_page.mainloop()
 
 #Tema 
 #MainPage
