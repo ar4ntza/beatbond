@@ -2,6 +2,18 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
 
+def option_page():
+    option_page = ctk.CTk()
+    option_page.title("BeatBond")
+    option_page.geometry("700x700")
+    option_page.config(background='#FBEBC7')
+
+    etiqueta = ctk.CTkLabel(option_page, text="¡Bienvenido a la nueva ventana!")
+    etiqueta.pack()
+
+    # Mostrar la nueva ventana
+    option_page.mainloop()
+
 # Tema
 # MainPage
 mainpage = ctk.CTk()
@@ -20,7 +32,7 @@ slogan = ctk.CTkLabel(mainpage, text="Revolutionize your sound", font=("Helvetic
 slogan.pack()
 
 # Botón de iniciar
-boton_iniciar = ctk.CTkButton(mainpage, text="⭐Empezar⭐", corner_radius=32, fg_color="#D03561", hover_color="#EA516D", border_color='#FFCC70', font=("Helvetica", 50),  bg_color="#FBEBC7")
+boton_iniciar = ctk.CTkButton(mainpage, text="⭐Empezar⭐", corner_radius=32, fg_color="#D03561", hover_color="#EA516D", border_color='#FFCC70', font=("Helvetica", 50),  bg_color="#FBEBC7", command=option_page)
 boton_iniciar.pack()
 
 mainpage.mainloop()
