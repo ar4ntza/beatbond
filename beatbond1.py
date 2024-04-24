@@ -16,8 +16,7 @@ mainpage.geometry("700x700")
 mainpage.config(background='#FBEBC7')
 create_logo(mainpage, "#FFD700")  # Crear logo en la página principal
 
-# Estilos de fuente y otros elementos de la página principal...
-# ...
+
 
 # Función para la página de opciones
 def option_page():
