@@ -1,5 +1,11 @@
+import pandas as pd
+import networkx as nx
 import customtkinter as ctk
-from PIL import Image
+import tkinter as tk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+from PIL import Image, ImageTk
 
 # Función para crear el logo
 def create_logo(window, bg_color):
@@ -46,7 +52,7 @@ def option_page():
         genres_window.geometry("700x700")
         genres_window.config(background='#FBEBC7')
         create_logo(genres_window, "#FFD700")  # Crear logo en la página de géneros
-        # Configuración adicional para genres_window...
+        
         genres_window.mainloop()
 
     # Botones para navegar a las páginas de exploración y géneros
