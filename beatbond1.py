@@ -17,17 +17,20 @@ mainpage.geometry(f"{width}x{height}")
 image = Image.open("images/ondas.jpg")
 background_image = ImageTk.PhotoImage(image)
 background_label = ctk.CTkLabel(mainpage, image=background_image, text="")
-background_label.pack(fill="both", expand=True)  # Usar relwidth y relheight para cubrir toda la ventana
+background_label.pack(fill="both", expand=True)  
 
 # Función para la página de opciones
 def option_page():
     mainpage.destroy()
     option_window = ctk.CTk()
     option_window.title("Página de Opciones")
-    option_window.geometry("700x700")
-    option_window.config(background='#FBEBC7')
-    
-
+    width = option_window.winfo_screenwidth()
+    height = option_window.winfo_screenheight()
+    option_window.geometry(f"{width}x{height}")
+    image = Image.open("images/discos.jpg")
+    background_image = ImageTk.PhotoImage(image)
+    background_label = ctk.CTkLabel(option_window, image=background_image, text="")
+    background_label.pack(fill="both", expand=True)
     # Función para la página de exploración
     def browse_page():
         option_window.destroy()
@@ -295,21 +298,19 @@ def option_page():
         genres_window.mainloop()
 
     # Botones para navegar a las páginas de exploración y géneros
-    frame_botones = ctk.CTkFrame(option_window, bg_color="#FBEBC7", fg_color="#FBEBC7")
-    frame_botones.pack(pady=20)
     boton_font = ("Impact", 50)
-    boton1 = ctk.CTkButton(frame_botones, text="EXPLORAR", command=browse_page,
-                           corner_radius=32, fg_color="#5A2B71", hover_color="#9350b4",
-                           border_color='#5A2B71', font=boton_font, bg_color="#FBEBC7")
-    boton1.pack(side="left", padx=10)
+    boton1 = ctk.CTkButton(option_window, text="EXPLORAR", command=browse_page,
+                            corner_radius=50, fg_color="#FBBE28", hover_color="#F8C546",
+                            border_color='#5A2B71', font=boton_font, bg_color="transparent")
+    boton1.place(relx=0.4, rely=0.5, anchor="center")
 
-    boton2 = ctk.CTkButton(frame_botones, text="GÉNEROS", command=genres_page,
-                           corner_radius=32, fg_color="#5A2B71", hover_color="#9350b4",
-                           border_color='#5A2B71', font=boton_font, bg_color="#FBEBC7")
-    boton2.pack(side="left", padx=10)
+    # Create and place the second button
+    boton2 = ctk.CTkButton(option_window, text="GÉNEROS", command=genres_page,
+                            corner_radius=50, fg_color="#FBBE28", hover_color="#F8C546",
+                            border_color='#5A2B71', font=boton_font, bg_color="transparent")
+    boton2.place(relx=0.6, rely=0.5, anchor="center")
 
     option_window.mainloop()
-
 # Font Styles
 button_font = ctk.CTkFont(family="Impact", size=40, slant="italic")
 
@@ -317,8 +318,8 @@ button_frame = ctk.CTkFrame(mainpage, bg_color="transparent", fg_color="transpar
 button_frame.place(relx=0.2, rely=0.9, anchor="center")  # Centra el marco de botón en la ventana
 
 start_button = ctk.CTkButton(button_frame, text="⭐ EMPEZAR ⭐", corner_radius=32, 
-                              fg_color="#460A75", hover_color="#621C99", 
-                              border_color='#9F54DB', font=button_font, 
+                              fg_color="#FBBE28", hover_color="#F8C546", 
+                              border_color='#FBBE28', font=button_font, 
                               bg_color="transparent", command=option_page)
 start_button.pack()
 
