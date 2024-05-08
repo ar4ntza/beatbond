@@ -9,37 +9,63 @@ from PIL import Image, ImageTk
 import numpy as np
 import sys
 
-mainpage = ctk.CTk()
-mainpage.title("BeatBond")
-width = mainpage.winfo_screenwidth()
-height = mainpage.winfo_screenheight()
-mainpage.geometry(f"{width}x{height}")
-image = Image.open("images/ondas.jpg")
-background_image = ImageTk.PhotoImage(image)
-background_label = ctk.CTkLabel(mainpage, image=background_image, text="")
-background_label.pack(fill="both", expand=True)  
-
-# Función para la página de opciones
-def option_page():
-    mainpage.destroy()
-    option_window = ctk.CTk()
-    option_window.title("Página de Opciones")
-    width = option_window.winfo_screenwidth()
-    height = option_window.winfo_screenheight()
-    option_window.geometry(f"{width}x{height}")
-    image = Image.open("images/discos.jpg")
-    background_image = ImageTk.PhotoImage(image)
-    background_label = ctk.CTkLabel(option_window, image=background_image, text="")
-    background_label.pack(fill="both", expand=True)
-    # Función para la página de exploración
-    def browse_page():
-        option_window.destroy()
-        browse_window = ctk.CTk()
-        browse_window.title("Explorar Canciones")
-        browse_window.geometry("700x700")
-        browse_window.config(background='#FBEBC7')
+class BeatBondApp:
+    def __init__(self):
+        self.mainpage = ctk.CTk()
+        self.mainpage.title("BeatBond")
+        self.width = self.mainpage.winfo_screenwidth()
+        self.height = self.mainpage.winfo_screenheight()
+        self.mainpage.geometry(f"{self.width}x{self.height}")
+        self.background_image = ImageTk.PhotoImage(Image.open("images/ondas.jpg"))
+        self.background_label = ctk.CTkLabel(self.mainpage, image=self.background_image, text="")
+        self.background_label.pack(fill="both", expand=True)
         
-        # Función para cargar datos de canciones desde el archivo de Excel
+        self.option_window = None
+        self.browse_window = None
+        self.genres_window = None
+
+        self.create_main_page()
+
+    def create_main_page(self):
+        button_frame = ctk.CTkFrame(self.mainpage, bg_color="transparent", fg_color="transparent")
+        button_frame.place(relx=0.2, rely=0.9, anchor="center")
+
+        start_button = ctk.CTkButton(button_frame, text="Get Started", corner_radius=32, 
+                                    fg_color="#7118C0", hover_color="#8A3DCF", 
+                                    border_color='#7118C0', font = ('<Century Gothic>', 40, "bold"),
+                                    bg_color="transparent", command=self.option_page)
+        start_button.pack()
+
+        self.mainpage.mainloop()
+
+    def option_page(self):
+        self.mainpage.destroy()
+        self.option_window = ctk.CTk()
+        self.option_window.title("Página de Opciones")
+        self.option_window.geometry(f"{self.width}x{self.height}")
+        self.background_image = ImageTk.PhotoImage(Image.open("images/discos.jpg"))
+        self.background_label = ctk.CTkLabel(self.option_window, image=self.background_image, text="")
+        self.background_label.pack(fill="both", expand=True)
+
+        boton_font = ("Impact", 50)
+        boton1 = ctk.CTkButton(self.option_window, text="EXPLORAR", command=self.browse_page,
+                                corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
+                                border_color='#7118C0', font=boton_font, bg_color="transparent")
+        boton1.place(relx=0.4, rely=0.5, anchor="center")
+
+        boton2 = ctk.CTkButton(self.option_window, text="GÉNEROS", command=self.genres_page,
+                                corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
+                                border_color='#7118C0', font=boton_font, bg_color="transparent")
+        boton2.place(relx=0.6, rely=0.5, anchor="center")
+
+        self.option_window.mainloop()
+
+    def browse_page(self):
+        self.option_window.destroy()
+        self.browse_window = ctk.CTk()
+        self.browse_window.title("Explorar Canciones")
+        self.browse_window.geometry("700x700")
+        self.browse_window.config(background='#FBEBC7')
         def cargar_datos(archivo_excel):
             return pd.read_excel(archivo_excel)
 
@@ -187,31 +213,31 @@ def option_page():
             print("memoria usada con yields: ", sys.getsizeof(buscar_canciones), "bytes")
 
         # Barra de búsqueda
-        search_bar = ctk.CTkEntry(browse_window, placeholder_text="Ingrese una canción")
+        search_bar = ctk.CTkEntry(self.browse_window, placeholder_text="Ingrese una canción")
         search_bar.pack(pady=10)
 
-        search_button = ctk.CTkButton(browse_window, text="Buscar", command=buscar_mostrar, bg_color="#FBEBC7", hover_color="#EF3340", fg_color="#EA516D")
+        search_button = ctk.CTkButton(self.browse_window, text="Buscar", command=buscar_mostrar, bg_color="#FBEBC7", hover_color="#EF3340", fg_color="#EA516D")
         search_button.pack(pady=10)
 
         # Frame para contener los resultados
-        results_frame = ctk.CTkFrame(browse_window)
+        results_frame = ctk.CTkFrame(self.browse_window)
         results_frame.pack(pady=10)
 
         # Lista para mostrar resultados
         results_list = ctk.CTkTextbox(results_frame, bg_color="#FBEBC7", fg_color="#FF808B", border_width=0)
         results_list.pack(expand=True, fill=ctk.BOTH)
+        credit_button = ctk.CTkButton(self.browse_window, text="👽", command=self.creditos, fg_color="#FBEBC7", bg_color="#FBEBC7", hover_color="#F8C546")
+        credit_button.pack(pady=10)
 
-        create_related_frames(browse_window)
-        browse_window.mainloop()
-
-    # Función para la página de géneros
-    def genres_page():
-        option_window.destroy()
-        genres_window = ctk.CTk()
-        genres_window.title("Página de Géneros")
-        genres_window.geometry("700x700")
-        genres_window.config(background='#FBEBC7')
-        search_frame = ctk.CTkFrame(genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7")
+        create_related_frames(self.browse_window)
+        self.browse_window.mainloop()
+        
+    def genres_page(self):
+        self.genres_window = ctk.CTk()
+        self.genres_window.title("Página de Géneros")
+        self.genres_window.geometry("700x700")
+        self.genres_window.config(background='#FBEBC7')
+        search_frame = ctk.CTkFrame(self.genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7")
         search_frame.pack(side=tk.TOP, fill=tk.X)
         
          # Asumiendo que tienes una columna 'genero' en tu archivo Excel 'AH.xlsx'
@@ -239,10 +265,10 @@ def option_page():
         relations_listbox = None
 
         # Dividir la ventana en dos frames
-        frame_left = ctk.CTkFrame(genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7", corner_radius=32)
+        frame_left = ctk.CTkFrame(self.genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7", corner_radius=32)
         frame_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=1, padx=(20, 20), pady=(20, 20))  # add 20px padding to the left, 20px padding to the right, 20px padding to the top, and 20px padding to the bottom
 
-        frame_right = ctk.CTkFrame(genres_window, fg_color="#EAD3E2", bg_color="#FBEBC7",corner_radius=32)
+        frame_right = ctk.CTkFrame(self.genres_window, fg_color="#EAD3E2", bg_color="#FBEBC7",corner_radius=32)
         frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1, padx=(20, 20), pady=(20, 20))  # add 20px padding to the left, 20px padding to the right, 20px padding to the top, and 20px padding to the bottom
         # Función para actualizar el grafo y la lista de relaciones
         def update_graph_and_relations(search_query):
@@ -295,32 +321,31 @@ def option_page():
 
         search_button = ctk.CTkButton(search_frame, text="🔍", command=lambda: update_graph_and_relations(search_bar.get()), fg_color="#5A2B71", bg_color="#FBEBC7", hover_color="#9350b4", font=('Impact', 25), width=10)
         search_button.pack(padx=15)
-        genres_window.mainloop()
-
-    # Botones para navegar a las páginas de exploración y géneros
-    boton_font = ("Impact", 50)
-    boton1 = ctk.CTkButton(option_window, text="EXPLORAR", command=browse_page,
+        credit_button = ctk.CTkButton(self.genres_window, text="👽", command=self.creditos, fg_color="#FBEBC7", bg_color="#FBEBC7", hover_color="#F8C546")
+        credit_button.pack(pady=10)
+        browse_button = ctk.CTkButton(self.genres_window, text="Explorar Canciones", command=self.browse_page,
                             corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
-                            border_color='#7118C0', font=boton_font, bg_color="transparent")
-    boton1.place(relx=0.4, rely=0.5, anchor="center")
+                            border_color='#7118C0', font = ('<Century Gothic>', 40, "bold"), bg_color="transparent")
+        browse_button.pack(side=tk.BOTTOM, pady=20)
+        self.genres_window.mainloop()
 
-    # Create and place the second button
-    boton2 = ctk.CTkButton(option_window, text="GÉNEROS", command=genres_page,
-                            corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
-                            border_color='#7118C0', font=boton_font, bg_color="transparent")
-    boton2.place(relx=0.6, rely=0.5, anchor="center")
+    def creditos(self):
+        self.credit_page = ctk.CTk()
+        self.credit_page.title("Página Personalizada")
+        self.credit_page.geometry("400x300")
+        self.credit_page.config(bg="#060515")  # Change the background color of the page
 
-    option_window.mainloop()
-# Font Styles
+        frame = ctk.CTkFrame(self.credit_page, bg_color="#060515")
+        frame.pack(pady=20)
 
+        label = ctk.CTkLabel(frame, text="(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\n\nElaborado por:\nArantza García y Samantha Cortés", font=('<Arial>', 22, "bold", "italic"), text_color="#FFFFFF", bg_color="#060515")
+        label.pack()       
+        cred_image = Image.open('images/zinkys.png')
+        cred = ctk.CTkImage(light_image=cred_image, dark_image=cred_image, size=(600, 600))
+        logo_label = ctk.CTkLabel(self.credit_page, text="", image=cred, bg_color='transparent')
+        logo_label.pack(pady=20, padx=150)
+        cred_image.close()
+        self.credit_page.mainloop()
 
-button_frame = ctk.CTkFrame(mainpage, bg_color="transparent", fg_color="transparent")
-button_frame.place(relx=0.2, rely=0.9, anchor="center")  # Centra el marco de botón en la ventana
-
-start_button = ctk.CTkButton(button_frame, text="Get Started", corner_radius=32, 
-                              fg_color="#7118C0", hover_color="#8A3DCF", 
-                              border_color='#7118C0', font = ('<Century Gothic>', 40, "bold"),
-                              bg_color="transparent", command=option_page)
-start_button.pack()
-
-mainpage.mainloop()
+if __name__ == "__main__":
+    app = BeatBondApp()
