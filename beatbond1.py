@@ -300,26 +300,26 @@ def option_page():
     # Botones para navegar a las páginas de exploración y géneros
     boton_font = ("Impact", 50)
     boton1 = ctk.CTkButton(option_window, text="EXPLORAR", command=browse_page,
-                            corner_radius=50, fg_color="#FBBE28", hover_color="#F8C546",
-                            border_color='#5A2B71', font=boton_font, bg_color="transparent")
+                            corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
+                            border_color='#7118C0', font=boton_font, bg_color="transparent")
     boton1.place(relx=0.4, rely=0.5, anchor="center")
 
     # Create and place the second button
     boton2 = ctk.CTkButton(option_window, text="GÉNEROS", command=genres_page,
-                            corner_radius=50, fg_color="#FBBE28", hover_color="#F8C546",
-                            border_color='#5A2B71', font=boton_font, bg_color="transparent")
+                            corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
+                            border_color='#7118C0', font=boton_font, bg_color="transparent")
     boton2.place(relx=0.6, rely=0.5, anchor="center")
 
     option_window.mainloop()
 # Font Styles
-button_font = ctk.CTkFont(family="Impact", size=40, slant="italic")
+
 
 button_frame = ctk.CTkFrame(mainpage, bg_color="transparent", fg_color="transparent")
 button_frame.place(relx=0.2, rely=0.9, anchor="center")  # Centra el marco de botón en la ventana
 
-start_button = ctk.CTkButton(button_frame, text="⭐ EMPEZAR ⭐", corner_radius=32, 
-                              fg_color="#FBBE28", hover_color="#F8C546", 
-                              border_color='#FBBE28', font=button_font, 
+start_button = ctk.CTkButton(button_frame, text="Get Started", corner_radius=32, 
+                              fg_color="#7118C0", hover_color="#8A3DCF", 
+                              border_color='#7118C0', font = ('<Century Gothic>', 40, "bold"),
                               bg_color="transparent", command=option_page)
 start_button.pack()
 
