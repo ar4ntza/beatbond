@@ -10,8 +10,10 @@ import numpy as np
 import sys
 import time
 from pympler import asizeof
+
+#clase de la aplicacion
 class BeatBondApp:
-    def __init__(self):
+    def __init__(self): #mainpage
         self.mainpage = ctk.CTk()
         self.mainpage.title("BeatBond")
         self.width = self.mainpage.winfo_screenwidth()
@@ -75,6 +77,7 @@ class BeatBondApp:
                                     border_color='#7118C0', font=button_font, bg_color="transparent")
         genres_button.place(relx=0.6, rely=0.5, anchor="center")
 
+    #pagina de busqueda de la cancion
     def browse_page(self):
         self.browse_window = ctk.CTk()
         self.browse_window.title("Explorar Canciones")
@@ -84,10 +87,10 @@ class BeatBondApp:
         self.browse_window.config(background='#292450')
         search_frame = ctk.CTkFrame(self.browse_window, fg_color="#292450", bg_color="#292450")
         search_frame.pack(side=tk.TOP, fill=tk.X)
-
+        #carga de datos
         def cargar_datos(archivo_excel):
             return pd.read_excel(archivo_excel)
-
+        #generacion del grafo
         def crear_grafo(datos_canciones):
             grafo = nx.Graph()
 
@@ -98,7 +101,7 @@ class BeatBondApp:
                     grafo.add_edge(cancion['cancion'], cancion_relacionada)
 
             return grafo
-
+        #relaciones entre generos
         relaciones = [
             ('Rock', 'Metal', 0.7),
             ('Rock', 'Heavy metal', 0.6),
@@ -113,13 +116,13 @@ class BeatBondApp:
             ('rap', 'Trap', 0.3),
             ('R&B', 'pop', 0.3),
         ]
-
+        #variables de los datos extraidos
         archivo_excel = 'beatbondDB.xlsx'
         datos_canciones = cargar_datos(archivo_excel)
         grafo_canciones = crear_grafo(datos_canciones)
-
+        #busqueda de canciones
         def buscar_canciones():
-            cancion_buscada = search_bar.get()  # Convertir a minúsculas
+            cancion_buscada = search_bar.get() 
 
             if not cancion_buscada:
                 return
@@ -132,10 +135,10 @@ class BeatBondApp:
             related_results_textbox.delete("1.0", "end")
 
             generator = (node for node, attr in grafo_canciones.nodes(data=True) if attr['genero'] == genero_cancion_buscada and node != cancion_buscada)
-
+            #yield 
             for cancion in generator:
                 yield cancion
-
+        #relaciones entre las canciones y los generos
         def find_related_genres_and_songs(grafo_canciones, cancion_buscada):
             genero_cancion_buscada = nx.get_node_attributes(grafo_canciones, 'genero')[cancion_buscada]
 
@@ -156,7 +159,7 @@ class BeatBondApp:
             print(f"Related songs: {related_songs}")
 
             return related_genres, related_songs
-
+        #extraer los datos para mostrarlos en los apartados
         def buscar_mostrar():
             inicio = time.time()
             related_results_textbox.delete("1.0", "end")
@@ -176,13 +179,13 @@ class BeatBondApp:
             tiempo_total = fin-inicio
             print("tiempo de ejecucion (con yields) (segundos): ", tiempo_total)
             print("memoria usada con yields: ", sys.getsizeof(buscar_canciones), "bytes")
-
+        #searchbar
         search_bar = ctk.CTkEntry(search_frame, placeholder_text="Buscar canción...", fg_color="#FFFFFF", text_color="black", bg_color="#292450", font=('Century Gothic', 25), width=500, corner_radius=45)
         search_bar.pack(padx=5, pady=10)
-
+        #searchbutton
         search_button = ctk.CTkButton(search_frame, text="🔍", command=buscar_mostrar, fg_color="#339966", bg_color="#292450", hover_color="#5FD198", font=('Century Gothic', 25), width=12, corner_radius=45)
         search_button.pack(pady=5)
-
+        #generos relacionados
         related_genres_frame = ctk.CTkFrame(self.browse_window, width=500, height=100, fg_color="#844178", bg_color="#292450")
         related_genres_frame.place(relx=0.5, rely=0.15, anchor="n")
 
@@ -192,6 +195,7 @@ class BeatBondApp:
         global related_genres_textbox
         related_genres_textbox = ctk.CTkTextbox(related_genres_frame, width=480, height=90, bg_color="#844178", font=('Century Gothic', 25), fg_color="#FFFFFF", text_color="#000000")
         related_genres_textbox.pack(pady=10)
+        #canciones del genero
 
         related_songs_frame = ctk.CTkFrame(self.browse_window, width=600, height=400, fg_color="#339966", bg_color="#292450")
         related_songs_frame.place(relx=0.3, rely=0.66, anchor="center")
@@ -202,6 +206,7 @@ class BeatBondApp:
         global related_songs_textbox
         related_songs_textbox = ctk.CTkTextbox(related_songs_frame, width=580, height=380, bg_color="#339966", font=('Century Gothic', 25), fg_color="#FFFFFF", text_color="#000000")
         related_songs_textbox.pack(pady=10)
+        #canciones del genero relacioando
 
         related_results_frame = ctk.CTkFrame(self.browse_window, width=600, height=400, fg_color="#339966", bg_color="#292450")
         related_results_frame.place(relx=0.7, rely=0.66, anchor="center")
@@ -326,6 +331,7 @@ class BeatBondApp:
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
+#instancia de la pagina principal
 if __name__ == "__main__":
     app = BeatBondApp()
     app.mainpage.mainloop()
