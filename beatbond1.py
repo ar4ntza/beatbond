@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 from PIL import Image, ImageTk
 import numpy as np
 import sys
+import time
+from pympler import asizeof
 class BeatBondApp:
     def __init__(self):
         self.mainpage = ctk.CTk()
@@ -76,8 +78,12 @@ class BeatBondApp:
     def browse_page(self):
         self.browse_window = ctk.CTk()
         self.browse_window.title("Explorar Canciones")
+        self.width = self.browse_window.winfo_screenwidth()
+        self.height = self.browse_window.winfo_screenheight()
         self.browse_window.geometry(f"{self.width}x{self.height}")
-        self.browse_window.config(background='#41397D')
+        self.browse_window.config(background='#292450')
+        search_frame = ctk.CTkFrame(self.browse_window, fg_color="#292450", bg_color="#292450")
+        search_frame.pack(side=tk.TOP, fill=tk.X)
 
         def cargar_datos(archivo_excel):
             return pd.read_excel(archivo_excel)
@@ -108,7 +114,7 @@ class BeatBondApp:
             ('R&B', 'pop', 0.3),
         ]
 
-        archivo_excel = 'AH.xlsx'
+        archivo_excel = 'beatbondDB.xlsx'
         datos_canciones = cargar_datos(archivo_excel)
         grafo_canciones = crear_grafo(datos_canciones)
 
@@ -120,10 +126,10 @@ class BeatBondApp:
             try:
                 genero_cancion_buscada = nx.get_node_attributes(grafo_canciones, 'genero')[cancion_buscada]
             except KeyError:
-                results_list.insert(ctk.END, f"Canción '{cancion_buscada}' no encontrada.\n")
+                related_results_textbox.insert(ctk.END, f"Canción '{cancion_buscada}' no encontrada.\n")
                 return
 
-            results_list.delete("1.0", "end")
+            related_results_textbox.delete("1.0", "end")
 
             generator = (node for node, attr in grafo_canciones.nodes(data=True) if attr['genero'] == genero_cancion_buscada and node != cancion_buscada)
 
@@ -151,34 +157,14 @@ class BeatBondApp:
 
             return related_genres, related_songs
 
-        def create_related_frames(browse_window):
-            related_genres_frame = ctk.CTkFrame(browse_window, width=300, height=300, fg_color="#BB5538", bg_color="#41397D")
-            related_genres_frame.place(relx=0.25, rely=0.70, anchor="center")
-
-            related_genres_label = ctk.CTkLabel(related_genres_frame, text="Géneros relacionados:", font=('<Century Gothic>', 22, "bold"), text_color="#FFFFFF")
-            related_genres_label.pack(pady=10)
-
-            global related_genres_textbox
-            related_genres_textbox = ctk.CTkTextbox(related_genres_frame, width=280, height=250, bg_color="#C26E60", font=('Century Gothic', 15))
-            related_genres_textbox.pack(pady=10)
-
-            related_songs_frame = ctk.CTkFrame(browse_window, width=500, height=500, fg_color="#BB5538", bg_color="#41397D")
-            related_songs_frame.place(relx=0.75, rely=0.70, anchor="center")
-
-            related_songs_label = ctk.CTkLabel(related_songs_frame, text="Canciones relacionadas:", font=('<Century Gothic>', 22, "bold"), text_color="#FFFFFF")
-            related_songs_label.pack(pady=10)
-
-            global related_songs_textbox
-            related_songs_textbox = ctk.CTkTextbox(related_songs_frame, width=280, height=250, bg_color="#C26E60",  font=('Century Gothic', 15))
-            related_songs_textbox.pack(pady=10)
-
         def buscar_mostrar():
-            results_list.delete("1.0", "end")
+            inicio = time.time()
+            related_results_textbox.delete("1.0", "end")
             related_genres_textbox.delete("1.0", "end")
             related_songs_textbox.delete("1.0", "end")
 
             for cancion in buscar_canciones():
-                results_list.insert(ctk.END, cancion + "\n")
+                related_results_textbox.insert(ctk.END, cancion + "\n")
 
 
             related_genres, related_songs = find_related_genres_and_songs(grafo_canciones, search_bar.get())
@@ -186,25 +172,48 @@ class BeatBondApp:
                 related_genres_textbox.insert("end", f"{genero}\n")
             for cancion in related_songs:
                 related_songs_textbox.insert("end", f"{cancion}\n")
-
+            fin = time.time()
+            tiempo_total = fin-inicio
+            print("tiempo de ejecucion (con yields) (segundos): ", tiempo_total)
             print("memoria usada con yields: ", sys.getsizeof(buscar_canciones), "bytes")
 
-        search_bar = ctk.CTkEntry(self.browse_window, placeholder_text="Ingrese una canción", width=500, height=35, bg_color="#41397D", font=('<Century Gothic>', 18, "bold"), text_color="#545454")
-        search_bar.pack(pady=40)
+        search_bar = ctk.CTkEntry(search_frame, placeholder_text="Buscar canción...", fg_color="#FFFFFF", text_color="black", bg_color="#292450", font=('Century Gothic', 25), width=500, corner_radius=45)
+        search_bar.pack(padx=5, pady=10)
 
-        search_button = ctk.CTkButton(self.browse_window, text="Buscar", command=buscar_mostrar, bg_color="#41397D", hover_color="#CBA052", fg_color="#AFA96E", font=('<Century Gothic>', 15, "bold"))
-        search_button.pack(pady=10)
+        search_button = ctk.CTkButton(search_frame, text="🔍", command=buscar_mostrar, fg_color="#339966", bg_color="#292450", hover_color="#5FD198", font=('Century Gothic', 25), width=12, corner_radius=45)
+        search_button.pack(pady=5)
 
-        results_frame = ctk.CTkFrame(self.browse_window)
-        results_frame.pack(pady=10)
+        related_genres_frame = ctk.CTkFrame(self.browse_window, width=500, height=100, fg_color="#844178", bg_color="#292450")
+        related_genres_frame.place(relx=0.5, rely=0.15, anchor="n")
 
-        results_list = ctk.CTkTextbox(results_frame, bg_color="#41397D", fg_color="#2D2F4E", border_width=0, font=('Century Gothic', 15), text_color="#FFFFFF", width=350, height=150)
-        results_list.pack(expand=True, fill=ctk.BOTH)
+        related_genres_label = ctk.CTkLabel(related_genres_frame, text="Generos relacionados:", font=('<Century Gothic>', 30, "bold"), text_color="#FFFFFF")
+        related_genres_label.pack(pady=10)
 
-        credit_button = ctk.CTkButton(self.browse_window, text="👽", command=self.creditos, fg_color="#FBEBC7", bg_color="#41397D", hover_color="#F8C546")
-        credit_button.pack(pady=10)
+        global related_genres_textbox
+        related_genres_textbox = ctk.CTkTextbox(related_genres_frame, width=480, height=90, bg_color="#844178", font=('Century Gothic', 25), fg_color="#FFFFFF", text_color="#000000")
+        related_genres_textbox.pack(pady=10)
 
-        create_related_frames(self.browse_window)
+        related_songs_frame = ctk.CTkFrame(self.browse_window, width=600, height=400, fg_color="#339966", bg_color="#292450")
+        related_songs_frame.place(relx=0.3, rely=0.66, anchor="center")
+
+        related_songs_label = ctk.CTkLabel(related_songs_frame, text="Canciones relacionadas:", font=('<Century Gothic>', 30, "bold"), text_color="#FFFFFF")
+        related_songs_label.pack(pady=10)
+
+        global related_songs_textbox
+        related_songs_textbox = ctk.CTkTextbox(related_songs_frame, width=580, height=380, bg_color="#339966", font=('Century Gothic', 25), fg_color="#FFFFFF", text_color="#000000")
+        related_songs_textbox.pack(pady=10)
+
+        related_results_frame = ctk.CTkFrame(self.browse_window, width=600, height=400, fg_color="#339966", bg_color="#292450")
+        related_results_frame.place(relx=0.7, rely=0.66, anchor="center")
+
+        related_results_label = ctk.CTkLabel(related_results_frame, text="Canciones del genero:", font=('<Century Gothic>', 30, "bold"), text_color="#FFFFFF")
+        related_results_label.pack(pady=10)
+
+        global related_results_textbox
+        related_results_textbox = ctk.CTkTextbox(related_results_frame, width=580, height=380, bg_color="#339966", font=('Century Gothic', 25), fg_color="#FFFFFF", text_color="#000000")
+        related_results_textbox.pack(pady=10)
+
+
         self.browse_window.mainloop()
 
 
@@ -212,13 +221,15 @@ class BeatBondApp:
         # Clear the main frame
         self.genres_window = ctk.CTk()
         self.genres_window.title("Página de Géneros")
-        self.genres_window.geometry("700x700")
-        self.genres_window.config(background='#FBEBC7')
-        search_frame = ctk.CTkFrame(self.genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7")
+        self.width = self.genres_window.winfo_screenwidth()
+        self.height = self.genres_window.winfo_screenheight()
+        self.genres_window.geometry(f"{self.width}x{self.height}")
+        self.genres_window.config(background='#292450')
+        search_frame = ctk.CTkFrame(self.genres_window, fg_color="#292450", bg_color="#292450")
         search_frame.pack(side=tk.TOP, fill=tk.X)
         
-         # Asumiendo que tienes una columna 'genero' en tu archivo Excel 'AH.xlsx'
-        df = pd.read_excel('AH.xlsx')
+         # Asumiendo que tienes una columna 'genero' en tu archivo Excel 'beatbondDB.xlsx'
+        df = pd.read_excel('beatbondDB.xlsx')
         G = nx.Graph()
         # Añadir géneros como nodos al grafo
         generos = df['genero'].unique()
@@ -242,11 +253,17 @@ class BeatBondApp:
         relations_listbox = None
 
         # Dividir la ventana en dos frames
-        frame_left = ctk.CTkFrame(self.genres_window, fg_color="#FBEBC7", bg_color="#FBEBC7", corner_radius=32)
+        frame_left = ctk.CTkFrame(self.genres_window, fg_color="#339966", bg_color="#292450", corner_radius=32)
         frame_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=1, padx=(20, 20), pady=(20, 20))  # add 20px padding to the left, 20px padding to the right, 20px padding to the top, and 20px padding to the bottom
+        related_graph_label = ctk.CTkLabel(frame_left, text="Grafo del género:", font=('<Century Gothic>', 30, "bold"), text_color="#FFFFFF")
+        related_graph_label.pack(pady=10)
 
-        frame_right = ctk.CTkFrame(self.genres_window, fg_color="#EAD3E2", bg_color="#FBEBC7",corner_radius=32)
+
+        frame_right = ctk.CTkFrame(self.genres_window, fg_color="#339966", bg_color="#292450",corner_radius=32)
         frame_right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=1, padx=(20, 20), pady=(20, 20))  # add 20px padding to the left, 20px padding to the right, 20px padding to the top, and 20px padding to the bottom
+        related_music_label = ctk.CTkLabel(frame_right, text="Canciones del género:", font=('<Century Gothic>', 30, "bold"), text_color="#FFFFFF")
+        related_music_label.pack(pady=10)        
+        
         # Función para actualizar el grafo y la lista de relaciones
         def update_graph_and_relations(search_query):
             nonlocal canvas, relations_listbox
@@ -265,10 +282,14 @@ class BeatBondApp:
                 for cancion in canciones_genero['cancion']:
                     subgraph.add_node(cancion)  # Añadir los nodos de las canciones al grafo
                     subgraph.add_edge(search_query, cancion)  # Conectar cada canción con el género
-            boton_fonty = ("Impact", 20)
+            boton_fonty = ("Century Gothic", 20)
+            
             # Actualizar la lista de relaciones
-            relations_listbox = ctk.CTkTextbox(frame_right, fg_color="#EAD3E2", text_color="#000000", font=boton_fonty, corner_radius=32)
+            relations_listbox = ctk.CTkTextbox(frame_right, fg_color="#FFFFFF", text_color="#000000", font=boton_fonty, corner_radius=32)
             relations_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+            
+            
+            
             if not canciones_genero.empty:
                 relations_listbox.insert(tk.END, f"Las canciones del género '{search_query}' son: \n")
                 for cancion in canciones_genero.itertuples():
@@ -293,36 +314,12 @@ class BeatBondApp:
             canvas.draw()
             canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
         
-        search_bar = ctk.CTkEntry(search_frame, placeholder_text="Buscar genero...", fg_color="#FBEBC7", text_color="black", bg_color="#FBEBC7", font=('Impact', 25), width=450)
-        search_bar.pack(padx=5, pady=2)
+        search_bar = ctk.CTkEntry(search_frame, placeholder_text="Buscar genero...", fg_color="#FFFFFF", text_color="black", bg_color="#292450", font=('Century Gothic', 25), width=500, corner_radius=45)
+        search_bar.pack(padx=5, pady=10)
 
-        search_button = ctk.CTkButton(search_frame, text="🔍", command=lambda: update_graph_and_relations(search_bar.get()), fg_color="#5A2B71", bg_color="#FBEBC7", hover_color="#9350b4", font=('Impact', 25), width=10)
+        search_button = ctk.CTkButton(search_frame, text="🔍", command=lambda: update_graph_and_relations(search_bar.get()), fg_color="#339966", bg_color="#292450", hover_color="#5FD198", font=('Century Gothic', 25), width=12, corner_radius=45)
         search_button.pack(padx=15)
-        credit_button = ctk.CTkButton(self.genres_window, text="👽", command=self.creditos, fg_color="#FBEBC7", bg_color="#FBEBC7", hover_color="#F8C546")
-        credit_button.pack(pady=10)
-        browse_button = ctk.CTkButton(self.genres_window, text="Explorar Canciones", command=self.browse_page,
-                            corner_radius=50, fg_color="#7118C0", hover_color="#8A3DCF", 
-                            border_color='#7118C0', font = ('<Century Gothic>', 40, "bold"), bg_color="transparent")
-        browse_button.pack(side=tk.BOTTOM, pady=20)
         self.genres_window.mainloop()
-
-    def creditos(self):
-        self.credit_page = ctk.CTk()
-        self.credit_page.title("Página Personalizada")
-        self.credit_page.geometry("400x300")
-        self.credit_page.config(bg="#060515")  # Change the background color of the page
-
-        frame = ctk.CTkFrame(self.credit_page, bg_color="#060515")
-        frame.pack(pady=20)
-
-        label = ctk.CTkLabel(frame, text="(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\n\nElaborado por:\nArantza García y Samantha Cortés", font=('<Arial>', 22, "bold", "italic"), text_color="#FFFFFF", bg_color="#060515")
-        label.pack()       
-        cred_image = Image.open('images/zinkys.png')
-        cred = ctk.CTkImage(light_image=cred_image, dark_image=cred_image, size=(600, 600))
-        logo_label = ctk.CTkLabel(self.credit_page, text="", image=cred, bg_color='transparent')
-        logo_label.pack(pady=20, padx=150)
-        cred_image.close()
-        self.credit_page.mainloop()
 
     def clear_main_frame(self):
         # Clear all widgets in the main frame
