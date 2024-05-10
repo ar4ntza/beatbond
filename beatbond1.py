@@ -1,15 +1,30 @@
-import pandas as pd
-import networkx as nx
-import customtkinter as ctk
-import tkinter as tk
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+'''
+Proyecto Final
+Sistema de recomendaciones de canciones empleando grafos
+
+Autoras: Cortés Samantha y García Arantza
+
+Version: 2.1 (Posibles actualizaciones futuras)
+
+Materia: Estructura de Datos y Algoritmos 
+        prof: Luis Eduardo Arenas Deseano
+
+09 de Mayo de 2024
+'''
+
+#bibliotecas empleadas
+import pandas as pd #database
+import networkx as nx #manejo de grafos
+import customtkinter as ctk #interfaz
+import tkinter as tk #interfaz
+import matplotlib.pyplot as plt #visualizacion del grafo
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #canvas del grafo
 from matplotlib.figure import Figure
-from PIL import Image, ImageTk
-import numpy as np
-import sys
-import time
-from pympler import asizeof
+from PIL import Image, ImageTk #manejo de las imagenes
+import numpy as np #manejo de arreglos
+import sys #gestion de la memoria
+import time #medicion de tiempos
+from pympler import asizeof #medicion de recursps
 
 #clase de la aplicacion
 class BeatBondApp:
@@ -110,7 +125,7 @@ class BeatBondApp:
         #carga de datos
         def cargar_datos(archivo_excel):
             return pd.read_excel(archivo_excel)
-        #generacion del grafo
+        #generacion del grafo a partir de los datos generados
         def crear_grafo(datos_canciones):
             grafo = nx.Graph()
 
@@ -136,41 +151,45 @@ class BeatBondApp:
             ('rap', 'Trap', 0.3),
             ('R&B', 'pop', 0.3),
         ]
-        #variables de los datos extraidos
+        #cargar los datos de la base de dstos
         archivo_excel = 'beatbondDB.xlsx'
         datos_canciones = cargar_datos(archivo_excel)
+        #grafo de las canciones
         grafo_canciones = crear_grafo(datos_canciones)
         #busqueda de canciones
         def buscar_canciones():
+            #obtener la cancion buscada desde la barra de busqueda
             cancion_buscada = search_bar.get() 
 
             if not cancion_buscada:
                 return
             try:
                 genero_cancion_buscada = nx.get_node_attributes(grafo_canciones, 'genero')[cancion_buscada]
-            except KeyError:
+            except KeyError: # Mostrar mensaje de error si la canción no se encuentra
                 related_results_textbox.insert(ctk.END, f"Canción '{cancion_buscada}' no encontrada.\n")
                 return
-
+            # Limpiar la lista de resultados
             related_results_textbox.delete("1.0", "end")
-
+            # Generar las canciones del mismo género
             generator = (node for node, attr in grafo_canciones.nodes(data=True) if attr['genero'] == genero_cancion_buscada and node != cancion_buscada)
             #yield 
             for cancion in generator:
                 yield cancion
+
         #relaciones entre las canciones y los generos
         def find_related_genres_and_songs(grafo_canciones, cancion_buscada):
+            #genero de cada cancion
             genero_cancion_buscada = nx.get_node_attributes(grafo_canciones, 'genero')[cancion_buscada]
 
             print(f"Genre of searched song: {genero_cancion_buscada}")
-
+            #encontrar la relacion entre los generos
             related_genres = []
             for relacion in relaciones:
                 if genero_cancion_buscada in relacion:
                     related_genres.append(relacion[0 if relacion[0] != genero_cancion_buscada else 1])
 
             print(f"Related genres: {related_genres}")
-
+            #encontrar la relacion entre las canciones
             related_songs = []
             for node, attr in grafo_canciones.nodes(data=True):
                 if attr['genero'] in related_genres:
@@ -182,17 +201,20 @@ class BeatBondApp:
         #extraer los datos para mostrarlos en los apartados
         def buscar_mostrar():
             inicio = time.time()
+            
             related_results_textbox.delete("1.0", "end")
             related_genres_textbox.delete("1.0", "end")
             related_songs_textbox.delete("1.0", "end")
-
+            #buscar la cancion
             for cancion in buscar_canciones():
                 related_results_textbox.insert(ctk.END, cancion + "\n")
-
+            # Encontrar géneros y canciones relacionadas
 
             related_genres, related_songs = find_related_genres_and_songs(grafo_canciones, search_bar.get())
+            # Mostrar géneros relacionados
             for genero in related_genres:
                 related_genres_textbox.insert("end", f"{genero}\n")
+            # Mostrar canciones relacionadas
             for cancion in related_songs:
                 related_songs_textbox.insert("end", f"{cancion}\n")
             fin = time.time()
